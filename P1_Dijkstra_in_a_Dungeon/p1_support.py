@@ -109,6 +109,5 @@ def save_level_costs(level, costs, filename='distance_map.csv'):
         csv_writer = writer(f)
         for row in rows:
             csv_writer.writerow(row)
-            
-    
+
     print("Saved file:", filename)

@@ -51,7 +51,33 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
-    pass
+    if cell in level['walls']:
+        return []
+
+    x = cell[0]
+    y = cell[1]
+
+    # list that holds adjacencies and costs
+    adj = []
+
+    # iterates in around cell
+    for a in range(x - 1, x + 2, 1):            # traverses the rows of the cell
+        for b in range(y - 1, y + 2, 1):        # traverses the columns of the cell
+            if (a, b) in level['walls']:        # if wall then skip iteration
+                continue
+            elif (a, b) == cell:                # if original cell then skip iteration
+                continue
+            else:
+                if (a, b) == (x - 1, y + 1) or (a, b) == (x + 1, y + 1) or (a, b) == (x - 1, y - 1) or (a, b) == (
+                        x + 1, y - 1):
+                    dCost = (0.5 * sqrt(2) * level['spaces'][(a, b)]) + (0.5 * sqrt(2) * level['spaces'][(x, y)])
+                    adj.append(((a, b), dCost))
+                else:
+                    sCost = (0.5 * level['spaces'][(a, b)]) + (0.5 * level['spaces'][(x, y)])
+                    adj.append(((a, b), sCost))
+    print(adj)
+
+    return adj
 
 
 def test_route(filename, src_waypoint, dst_waypoint):
@@ -81,7 +107,7 @@ def test_route(filename, src_waypoint, dst_waypoint):
 
 
 def cost_to_all_cells(filename, src_waypoint, output_filename):
-    """ Loads a level, calculates the cost to all reachable cells from 
+    """ Loads a level, calculates the cost to all reachable cells from
     src_waypoint, then saves the result in a csv file with name output_filename.
 
     Args:
@@ -90,14 +116,14 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
         output_filename: The filename for the output csv file.
 
     """
-    
+
     # Load and display the level.
     level = load_level(filename)
     show_level(level)
 
     # Retrieve the source coordinates from the level.
     src = level['waypoints'][src_waypoint]
-    
+
     # Calculate the cost to all reachable cells from src and save to a csv file.
     costs_to_all_cells = dijkstras_shortest_path_to_all(src, level, navigation_edges)
     save_level_costs(level, costs_to_all_cells, output_filename)
