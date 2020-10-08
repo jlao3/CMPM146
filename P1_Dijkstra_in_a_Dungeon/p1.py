@@ -17,6 +17,23 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
+    priorityq = []
+    heappush(priorityq, (initial_position, 0, (-1, -1)))                      #[node, cost, back pointer]
+    while priorityq:
+        current_cost, current_node, back_pointer = heappop(priorityq)
+        if current_node == destination:
+            #return path to destination
+            return
+        else:
+            neighbors = adj(current_node, graph)
+            for new_node in neighbors:                                         #generate successors
+                pathcost = new_node[1] + current_cost                          #calculate new pathcost for each node
+                if new_node not in priorityq:
+                    heappush(priorityq, (new_node[0], pathcost, current_node)) #add unvisited node
+                elif new_node in priorityq and new_node[1] > pathcost:
+                    new_node[1] = pathcost
+                    new_node[2] = current_node
+    return None
     pass
 
 
