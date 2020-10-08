@@ -51,11 +51,11 @@ def navigation_edges(level, cell):
              ((1,1), 1.4142135623730951),
              ... ]
     """
-    if cell in level['walls']:
+    if cell in level['walls']:                  # skip this call
         return []
 
-    x = cell[0]
-    y = cell[1]
+    x = cell[0]                                 # x = cell x-coordinate
+    y = cell[1]                                 # x = cell y-coordinate
 
     # list that holds adjacencies and costs
     adj = []
@@ -69,10 +69,10 @@ def navigation_edges(level, cell):
                 continue
             else:
                 if (a, b) == (x - 1, y + 1) or (a, b) == (x + 1, y + 1) or (a, b) == (x - 1, y - 1) or (a, b) == (
-                        x + 1, y - 1):
+                        x + 1, y - 1):          # if diagonal then use distance formula
                     dCost = (0.5 * sqrt(2) * level['spaces'][(a, b)]) + (0.5 * sqrt(2) * level['spaces'][(x, y)])
                     adj.append(((a, b), dCost))
-                else:
+                else:                           # if horizontal/vertical space then continue
                     sCost = (0.5 * level['spaces'][(a, b)]) + (0.5 * level['spaces'][(x, y)])
                     adj.append(((a, b), sCost))
     print(adj)
@@ -132,8 +132,12 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 if __name__ == '__main__':
     filename, src_waypoint, dst_waypoint = 'example.txt', 'a', 'e'
 
+    level = load_level(filename)
+    show_level(level)
+    cell = (3, 10)
+    navigation_edges(level, cell)
     # Use this function call to find the route between two waypoints.
-    test_route(filename, src_waypoint, dst_waypoint)
+    #test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+    #cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
