@@ -18,21 +18,20 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
 
     """
     priorityq = []
-    heappush(priorityq, (initial_position, 0, (-1, -1)))                      #[node, cost, back pointer]
+    heappush(priorityq, (initial_position, 0, (-1, -1)))                    # [node, cost, back pointer]
     while priorityq:
-        current_cost, current_node, back_pointer = heappop(priorityq)
+        current_node, current_cost, back_pointer = heappop(priorityq)
         if current_node == destination:
             #return path to destination
             return
-        else:
-            neighbors = adj(current_node, graph)
-            for new_node in neighbors:                                         #generate successors
-                pathcost = new_node[1] + current_cost                          #calculate new pathcost for each node
-                if new_node not in priorityq:
-                    heappush(priorityq, (new_node[0], pathcost, current_node)) #add unvisited node
-                elif new_node in priorityq and new_node[1] > pathcost:
-                    new_node[1] = pathcost
-                    new_node[2] = current_node
+        for new_node, new_cost in navigation_edges(graph, current_node):    # generate successors
+            print(new_cost, '\n')
+            pathcost = new_cost + current_cost                              # calculate new pathcost for each node
+            if new_node not in priorityq:
+                heappush(priorityq, (new_node[0], pathcost, current_node))  # add unvisited node
+            elif new_node in priorityq and new_node[1] > pathcost:
+                new_node[1] = pathcost
+                new_node[2] = current_node
     return None
     pass
 
@@ -92,7 +91,7 @@ def navigation_edges(level, cell):
                 else:                           # if horizontal/vertical space then continue
                     sCost = (0.5 * level['spaces'][(a, b)]) + (0.5 * level['spaces'][(x, y)])
                     adj.append(((a, b), sCost))
-    print(adj)
+    print(adj, '\n')
 
     return adj
 
@@ -149,12 +148,8 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
 if __name__ == '__main__':
     filename, src_waypoint, dst_waypoint = 'example.txt', 'a', 'e'
 
-    level = load_level(filename)
-    show_level(level)
-    cell = (3, 10)
-    navigation_edges(level, cell)
     # Use this function call to find the route between two waypoints.
-    #test_route(filename, src_waypoint, dst_waypoint)
+    test_route(filename, src_waypoint, dst_waypoint)
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
     #cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
