@@ -38,7 +38,6 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
             while curr != None:
                 path.append(curr)
                 curr = came_from[curr]
-            print("Path is ", path)
             return path
 
         for new_node, new_cost in navigation_edges(graph, current_node):
