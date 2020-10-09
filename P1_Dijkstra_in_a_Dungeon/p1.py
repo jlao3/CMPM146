@@ -1,6 +1,6 @@
 from p1_support import load_level, show_level, save_level_costs
 from math import inf, sqrt
-from heapq import heappop, heappush
+from heapq import heappop, heappush, heapify
 
 
 def dijkstras_shortest_path(initial_position, destination, graph, adj):
@@ -17,6 +17,7 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
+    
     # assembling queue on heap
     priorityQ = []
     heappush(priorityQ, (0, initial_position))
@@ -40,9 +41,13 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
                 cost_so_far[new_node] = pathCost
                 heappush(priorityQ, (pathCost, new_node))
                 came_from[new_node] = current_node
-
     return None
 
+def find_node(node, pqueue):
+    for element in pqueue:
+        if element[1] == node:
+            return True
+    return False
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """ Calculates the minimum cost to every reachable cell in a graph from the initial_position.
@@ -78,7 +83,7 @@ def navigation_edges(level, cell):
     if cell in level['walls']:                  # skip this call
         return []
 
-    x = cell[0]                                 # x = cell x-coordinate
+    x = cell[0]                                  # x = cell x-coordinate
     y = cell[1]                                 # x = cell y-coordinate
 
     # list that holds adjacencies and costs
@@ -99,7 +104,7 @@ def navigation_edges(level, cell):
                 else:                           # if horizontal/vertical space then continue
                     sCost = (0.5 * level['spaces'][(a, b)]) + (0.5 * level['spaces'][(x, y)])
                     adj.append(((a, b), sCost))
-
+                    
     return adj
 
 
