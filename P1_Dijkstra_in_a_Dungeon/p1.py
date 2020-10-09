@@ -17,23 +17,31 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
         Otherwise, return None.
 
     """
-    priorityq = []
-    heappush(priorityq, (initial_position, 0, (-1, -1)))                    # [node, cost, back pointer]
-    while priorityq:
-        current_node, current_cost, back_pointer = heappop(priorityq)
+    # assembling queue on heap
+    priorityQ = []
+    heappush(priorityQ, (0, initial_position))
+
+    # back pointer
+    came_from = {initial_position: None}
+
+    # keeps track of cost
+    cost_so_far = {initial_position: 0}
+
+    while priorityQ:
+        current_cost, current_node = heappop(priorityQ)
+
         if current_node == destination:
-            #return path to destination
+            print("Total cost = ", cost_so_far[current_node], '\n')
             return
-        for new_node, new_cost in navigation_edges(graph, current_node):    # generate successors
-            print(new_cost, '\n')
-            pathcost = new_cost + current_cost                              # calculate new pathcost for each node
-            if new_node not in priorityq:
-                heappush(priorityq, (new_node[0], pathcost, current_node))  # add unvisited node
-            elif new_node in priorityq and new_node[1] > pathcost:
-                new_node[1] = pathcost
-                new_node[2] = current_node
+
+        for new_node, new_cost in navigation_edges(graph, current_node):
+            pathCost = new_cost + current_cost
+            if new_node not in cost_so_far or pathCost < cost_so_far[new_node]:
+                cost_so_far[new_node] = pathCost
+                heappush(priorityQ, (pathCost, new_node))
+                came_from[new_node] = current_node
+
     return None
-    pass
 
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
@@ -91,7 +99,6 @@ def navigation_edges(level, cell):
                 else:                           # if horizontal/vertical space then continue
                     sCost = (0.5 * level['spaces'][(a, b)]) + (0.5 * level['spaces'][(x, y)])
                     adj.append(((a, b), sCost))
-    print(adj, '\n')
 
     return adj
 
