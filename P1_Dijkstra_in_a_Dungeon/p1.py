@@ -1,6 +1,6 @@
 from p1_support import load_level, show_level, save_level_costs
 from math import inf, sqrt
-from heapq import heappop, heappush
+from heapq import heappop, heappush, heapify
 
 
 def dijkstras_shortest_path(initial_position, destination, graph, adj):
@@ -18,23 +18,31 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
 
     """
     priorityq = []
-    heappush(priorityq, (initial_position, 0, (-1, -1)))                    # [node, cost, back pointer]
+    heappush(priorityq, (0, initial_position, (-1, -1)))                    # [node, cost, back pointer]
     while priorityq:
-        current_node, current_cost, back_pointer = heappop(priorityq)
+        print(priorityq, "queue")
+        current_cost, current_node, back_pointer = heappop(priorityq)
+        print(current_node, "current node")
         if current_node == destination:
             #return path to destination
-            return
-        for new_node, new_cost in navigation_edges(graph, current_node):    # generate successors
-            print(new_cost, '\n')
+            return []
+        neighbors = navigation_edges(graph, current_node)
+        for new_node, new_cost in neighbors:                                # generate successors
+            #print(new_cost, '\n')
             pathcost = new_cost + current_cost                              # calculate new pathcost for each node
-            if new_node not in priorityq:
-                heappush(priorityq, (new_node[0], pathcost, current_node))  # add unvisited node
-            elif new_node in priorityq and new_node[1] > pathcost:
-                new_node[1] = pathcost
-                new_node[2] = current_node
+            if not find_node(new_node, priorityq):
+                heappush(priorityq, (pathcost, new_node, current_node))     # add unvisited node
+                print(new_node, "new node")
+            elif find_node(new_node, priorityq):
+                print("change visited node cost")
     return None
     pass
 
+def find_node(node, pqueue):
+    for element in pqueue:
+        if element[1] == node:
+            return True
+    return False
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """ Calculates the minimum cost to every reachable cell in a graph from the initial_position.
@@ -70,7 +78,7 @@ def navigation_edges(level, cell):
     if cell in level['walls']:                  # skip this call
         return []
 
-    x = cell[0]                                 # x = cell x-coordinate
+    x = cell[0]                                  # x = cell x-coordinate
     y = cell[1]                                 # x = cell y-coordinate
 
     # list that holds adjacencies and costs
@@ -91,7 +99,7 @@ def navigation_edges(level, cell):
                 else:                           # if horizontal/vertical space then continue
                     sCost = (0.5 * level['spaces'][(a, b)]) + (0.5 * level['spaces'][(x, y)])
                     adj.append(((a, b), sCost))
-    print(adj, '\n')
+    #print(adj, '\n')
 
     return adj
 
