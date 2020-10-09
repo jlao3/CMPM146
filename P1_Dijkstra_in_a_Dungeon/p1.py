@@ -33,7 +33,13 @@ def dijkstras_shortest_path(initial_position, destination, graph, adj):
 
         if current_node == destination:
             print("Total cost = ", cost_so_far[current_node], '\n')
-            return
+            curr = current_node
+            path = []
+            while curr != None:
+                path.append(curr)
+                curr = came_from[curr]
+            print("Path is ", path)
+            return path
 
         for new_node, new_cost in navigation_edges(graph, current_node):
             pathCost = new_cost + current_cost
@@ -48,6 +54,8 @@ def find_node(node, pqueue):
         if element[1] == node:
             return True
     return False
+
+
 
 def dijkstras_shortest_path_to_all(initial_position, graph, adj):
     """ Calculates the minimum cost to every reachable cell in a graph from the initial_position.
@@ -153,8 +161,8 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
     src = level['waypoints'][src_waypoint]
 
     # Calculate the cost to all reachable cells from src and save to a csv file.
-    costs_to_all_cells = dijkstras_shortest_path_to_all(src, level, navigation_edges)
-    save_level_costs(level, costs_to_all_cells, output_filename)
+    #costs_to_all_cells = dijkstras_shortest_path_to_all(src, level, navigation_edges)
+    #save_level_costs(level, costs_to_all_cells, output_filename)
 
 
 if __name__ == '__main__':
