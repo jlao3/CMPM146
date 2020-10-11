@@ -21,7 +21,6 @@
   <component name="ChangeListManager">
     <list default="true" id="29408c5f-84e4-421e-b2de-dab669d85723" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/p1.py" beforeDir="false" afterPath="$PROJECT_DIR$/p1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,6 +89,9 @@
       <workItem from="1602253999284" duration="229000" />
       <workItem from="1602259823052" duration="165000" />
       <workItem from="1602275803611" duration="719000" />
+      <workItem from="1602279444979" duration="47000" />
+      <workItem from="1602301889903" duration="195000" />
+      <workItem from="1602356517417" duration="127000" />
     </task>
     <servers />
   </component>
@@ -117,24 +119,24 @@
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
     <state x="960" y="256" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.2560.1040@0.0.2560.1040" timestamp="1602131753239" />
-    <state width="2517" height="282" key="GridCell.Tab.0.bottom" timestamp="1602276526281">
+    <state width="2517" height="282" key="GridCell.Tab.0.bottom" timestamp="1602356645181">
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
-    <state width="2517" height="282" key="GridCell.Tab.0.bottom/0.0.2560.1040@0.0.2560.1040" timestamp="1602276526281" />
-    <state width="2517" height="282" key="GridCell.Tab.0.center" timestamp="1602276526281">
+    <state width="2517" height="282" key="GridCell.Tab.0.bottom/0.0.2560.1040@0.0.2560.1040" timestamp="1602356645181" />
+    <state width="2517" height="282" key="GridCell.Tab.0.center" timestamp="1602356645181">
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
-    <state width="2517" height="282" key="GridCell.Tab.0.center/0.0.2560.1040@0.0.2560.1040" timestamp="1602276526281" />
-    <state width="2517" height="282" key="GridCell.Tab.0.left" timestamp="1602276526281">
+    <state width="2517" height="282" key="GridCell.Tab.0.center/0.0.2560.1040@0.0.2560.1040" timestamp="1602356645181" />
+    <state width="2517" height="282" key="GridCell.Tab.0.left" timestamp="1602356645181">
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
-    <state width="2517" height="282" key="GridCell.Tab.0.left/0.0.2560.1040@0.0.2560.1040" timestamp="1602276526281" />
-    <state width="2517" height="282" key="GridCell.Tab.0.right" timestamp="1602276526281">
+    <state width="2517" height="282" key="GridCell.Tab.0.left/0.0.2560.1040@0.0.2560.1040" timestamp="1602356645181" />
+    <state width="2517" height="282" key="GridCell.Tab.0.right" timestamp="1602356645181">
       <screen x="0" y="0" width="2560" height="1040" />
     </state>
-    <state width="2517" height="282" key="GridCell.Tab.0.right/0.0.2560.1040@0.0.2560.1040" timestamp="1602276526281" />
+    <state width="2517" height="282" key="GridCell.Tab.0.right/0.0.2560.1040@0.0.2560.1040" timestamp="1602356645181" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/P1_Dijkstra_in_a_Dungeon$p1.coverage" NAME="p1 Coverage Results" MODIFIED="1602276503777" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/P1_Dijkstra_in_a_Dungeon$p1.coverage" NAME="p1 Coverage Results" MODIFIED="1602356569955" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
