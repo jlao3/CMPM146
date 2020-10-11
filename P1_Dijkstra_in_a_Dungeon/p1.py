@@ -1,6 +1,7 @@
 from p1_support import load_level, show_level, save_level_costs
 from math import inf, sqrt
 from heapq import heappop, heappush, heapify
+import sys
 
 
 def dijkstras_shortest_path(initial_position, destination, graph, adj):
@@ -187,11 +188,17 @@ def cost_to_all_cells(filename, src_waypoint, output_filename):
     save_level_costs(level, costs_to_all_cells, output_filename)
 
 
-if __name__ == '__main__':
-    filename, src_waypoint, dst_waypoint = 'example.txt', 'a', 'e'
 
-    # Use this function call to find the route between two waypoints.
-    test_route(filename, src_waypoint, dst_waypoint)
+if __name__ == '__main__':
+    sys.stdout = open('test_maze_path.txt', 'w')
+    test_route('test_maze.txt', 'a', 'd')
+
+    sys.stdout = open('console_output.txt', 'w')
+
+    test_route('my_maze.txt', 'a', 'b')
+    test_route('my_maze.txt', 'a', 'c')
+    test_route('my_maze.txt', 'a', 'd')
+    test_route('my_maze.txt', 'a', 'e')
 
     # Use this function to calculate the cost to all reachable cells from an origin point.
-    cost_to_all_cells(filename, src_waypoint, 'my_costs.csv')
+    cost_to_all_cells('my_maze.txt', 'a', 'my_maze_costs.csv')
