@@ -19,8 +19,30 @@ def traverse_nodes(node, board, state, identity):
     Returns:        A node from which the next stage of the search can proceed.
 
     """
-    # while node.child_nodes: #child_nodes is a dict
-        
+    bestNode = node
+    currentNode = node
+
+    bestScore = 0
+    tempScore = 0
+    
+    while not currentNode.untried_actions and currentNode.child_nodes:
+        pointerNode = None
+        for currChild in currentNode.child_nodes:
+            if currChild.visits != 0:
+                if identity == 'red':
+                    tempScore = (currChild.wins / currChild.visits) + (explore_faction * sqrt(log(node.visits) / currChild.visits))
+                if identity == 'blue':
+                    tempScore = (1 - (currChild.wins / currChild.visits)) + (explore_faction * sqrt(log(node.visits) / currChild.visits))
+            else:
+                tempScore = 0
+
+            if tempScore > bestScore:
+                bestScore = tempScore
+                bestNode = currChild
+                pointerNode = currChild
+        currentNode = pointerNode
+    
+    return bestNode
     # Hint: return leaf_node
 
 
@@ -40,6 +62,7 @@ def expand_leaf(node, board, state):
     except:
         return node #if list is empty, return node
     else:
+        state = board.next_state(state, action)
         new_node = MCTSNode(parent=node, parent_action=action,action_list=node.untried_actions) #create new leaf with list of untried actions
         node.child_nodes[action] = new_node #make pointer of child node equal the new_node
 
@@ -71,8 +94,7 @@ def backpropagate(node, won):
 
     """
     while node is not None: # while backtracking is true
-        if won: # count for won
-            node.wins += 1
+        node.wins += 1      # -1 if lost, 0 for draw/nothing, 1 for win
         node.visits += 1    # count for visits
         node = node.parent  # traverse to parent node
 
@@ -97,6 +119,11 @@ def think(board, state):
         # Start at root
         node = root_node
 
+        # Do MCTS - This is all you!
+        node = root_node
+        node = traverse_nodes(node, board, sampled_game, identity_of_bot)
+
+        leaf_node = expand_leaf(node, board, sampled_game)
     # Return an action, typically the most frequently used action (from the root) or the action with the best
     # estimated win rate.
     return None

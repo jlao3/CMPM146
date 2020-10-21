@@ -13,7 +13,8 @@ class MCTSNode:
         """
         self.parent = parent                    # Parent node to this node
         self.parent_action = parent_action      # The move that got us to this node - "None" for the root node.
-
+        self.state = None
+        
         self.child_nodes = {}                   # Action -> MCTSNode dictionary of children
         self.untried_actions = action_list      # Yet unexplored actions
 
