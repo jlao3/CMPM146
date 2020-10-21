@@ -36,12 +36,12 @@ def expand_leaf(node, board, state):
 
     """
     try:
-        action = node.untried_actions.pop()
+        action = node.untried_actions.pop() #tries to pop() an action from the list
     except:
-        return node
+        return node #if list is empty, return node
     else:
-        new_node = MCTSNode(parent=node, parent_action=action,action_list=node.untried_actions)
-        node.child_nodes[action] = new_node
+        new_node = MCTSNode(parent=node, parent_action=action,action_list=node.untried_actions) #create new leaf with list of untried actions
+        node.child_nodes[action] = new_node #make pointer of child node equal the new_node
 
     return new_node
     # Hint: return new_node
@@ -55,10 +55,10 @@ def rollout(board, state):
         state:  The state of the game.
 
     """
-    while not board.is_ended(state):
-        possible_actions = board.legal_actions(state)
-        action = choice(possible_actions)
-        state = board.next_state(state, action)
+    while not board.is_ended(state):    # while game is not done
+        possible_actions = board.legal_actions(state)   #acquire a list of legal actions
+        action = choice(possible_actions)   # choose a random action
+        state = board.next_state(state, action) # state becomes the next state of chosen action
     return state
 
 
@@ -70,11 +70,11 @@ def backpropagate(node, won):
         won:    An indicator of whether the bot won or lost the game.
 
     """
-    while node is not None:
-        if won:
+    while node is not None: # while backtracking is true
+        if won: # count for won
             node.wins += 1
-        node.visits += 1
-        node = node.parent  
+        node.visits += 1    # count for visits
+        node = node.parent  # traverse to parent node
 
 
 def think(board, state):
