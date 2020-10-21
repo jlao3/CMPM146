@@ -2,6 +2,7 @@
 from mcts_node import MCTSNode
 from random import choice
 from math import sqrt, log
+import p3_t3
 
 num_nodes = 1000
 explore_faction = 2.
@@ -18,7 +19,8 @@ def traverse_nodes(node, board, state, identity):
     Returns:        A node from which the next stage of the search can proceed.
 
     """
-    pass
+    # while node.child_nodes: #child_nodes is a dict
+        
     # Hint: return leaf_node
 
 
@@ -33,7 +35,15 @@ def expand_leaf(node, board, state):
     Returns:    The added child node.
 
     """
-    pass
+    try:
+        action = node.untried_actions.pop()
+    except:
+        return node
+    else:
+        new_node = MCTSNode(parent=node, parent_action=action,action_list=node.untried_actions)
+        node.child_nodes[action] = new_node
+
+    return new_node
     # Hint: return new_node
 
 
@@ -45,7 +55,11 @@ def rollout(board, state):
         state:  The state of the game.
 
     """
-    pass
+    while not board.is_ended(state):
+        possible_actions = board.legal_actions(state)
+        action = choice(possible_actions)
+        state = board.next_state(state, action)
+    return state
 
 
 def backpropagate(node, won):
@@ -56,7 +70,11 @@ def backpropagate(node, won):
         won:    An indicator of whether the bot won or lost the game.
 
     """
-    pass
+    while node is not None:
+        if won:
+            node.wins += 1
+        node.visits += 1
+        node = node.parent  
 
 
 def think(board, state):
@@ -78,8 +96,6 @@ def think(board, state):
 
         # Start at root
         node = root_node
-
-        # Do MCTS - This is all you!
 
     # Return an action, typically the most frequently used action (from the root) or the action with the best
     # estimated win rate.
