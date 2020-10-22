@@ -4,7 +4,7 @@ from random import choice
 from math import sqrt, log, inf
 import p3_t3
 
-num_nodes = 1000
+num_nodes = 100
 explore_faction = 2.
 
 def traverse_nodes(node, board, state, identity):
@@ -21,7 +21,9 @@ def traverse_nodes(node, board, state, identity):
     """
     currentNode = node
 
-    while not currentNode.untried_actions and currentNode.child_nodes: #no untried actions left, child nodes available to traverse
+    if currentNode.untried_actions or not currentNode.child_nodes:
+        return currentNode
+    else:
         nextNode = None
         highScore = -inf
         for catcher, childNode in currentNode.child_nodes.items(): #catcher contains values we don't care about in node, childNode is what we want to check
@@ -33,19 +35,19 @@ def traverse_nodes(node, board, state, identity):
             if tempScore > highScore:   # if temporary score is higher then our best, then make that the next searched node and update highScore
                 highScore = tempScore
                 nextNode = childNode
-        currentNode = nextNode
-
-    return currentNode  # return the best childNode
+        return traverse_nodes(nextNode, board, state, identity)
     # Hint: return leaf_node
-
 
 def expand_leaf(node, board, state):
     """ Adds a new leaf to the tree by creating a new child node for the given node.
+
     Args:
         node:   The node for which a child will be added.
         board:  The game setup.
         state:  The state of the game.
+
     Returns:    The added child node.
+
     """
     try:
         action = node.untried_actions.pop() # tries to pop() an action from the list
@@ -60,9 +62,11 @@ def expand_leaf(node, board, state):
 
 def rollout(board, state):
     """ Given the state of the game, the rollout plays out the remainder randomly.
+
     Args:
         board:  The game setup.
         state:  The state of the game.
+
     """
     while not board.is_ended(state):    # while game is not done
         possible_actions = board.legal_actions(state)   # acquire a list of legal actions
@@ -72,22 +76,28 @@ def rollout(board, state):
 
 def backpropagate(node, won):
     """ Navigates the tree from a leaf node to the root, updating the win and visit count of each node along the path.
+
     Args:
         node:   A leaf node.
         won:    An indicator of whether the bot won or lost the game.
+
     """
-    while node is not None: # while backtracking is true
+    if node != None:    # while backtracking is true
         node.wins += won    # -1 if lost, 0 for draw/nothing, 1 for win
         node.visits += 1    # count for visits
         node = node.parent  # traverse to parent node
+        backpropagate(node, won)
 
 
 def think(board, state):
     """ Performs MCTS by sampling games and calling the appropriate functions to construct the game tree.
+
     Args:
         board:  The game setup.
         state:  The state of the game.
+
     Returns:    The action to be taken.
+
     """
     identity_of_bot = board.current_player(state)
     root_node = MCTSNode(parent=None, parent_action=None, action_list=board.legal_actions(state))
