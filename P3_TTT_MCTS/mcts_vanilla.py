@@ -4,7 +4,8 @@ from random import choice
 from math import sqrt, log, inf
 import p3_t3
 
-num_nodes = 1000
+num_nodes = 100
+num_nodesTWO = 25
 explore_faction = 2.
 
 def traverse_nodes(node, board, state, identity):
@@ -28,7 +29,7 @@ def traverse_nodes(node, board, state, identity):
         highScore = -inf
         for catcher, childNode in currentNode.child_nodes.items(): #catcher contains values we don't care about in node, childNode is what we want to check
             childNode.visits += 1
-            if identity == 'red':   # if red then value is equal to 1, thus nothing happens
+            if identity == 1:   # if red then value is equal to 1, thus nothing happens
                 tempScore = (childNode.wins / childNode.visits) + (explore_faction * sqrt(log(childNode.parent.visits) / childNode.visits))
             else:   # else identity is blue, thus multiple by -1
                 tempScore = ((-1 * childNode.wins) / childNode.visits) + (explore_faction * sqrt(log(childNode.parent.visits) / childNode.visits))
@@ -102,50 +103,100 @@ def think(board, state):
     identity_of_bot = board.current_player(state)
     root_node = MCTSNode(parent=None, parent_action=None, action_list=board.legal_actions(state))
 
-    for steps in range(num_nodes):
-        # Copy the game for sampling a playthrough
-        sampled_game = state
-
-        # Start at root
-        node = root_node
-
-        # Do MCTS - This is all you!
-
-        # traverse tree until we find best leaf
-        node = traverse_nodes(node, board, sampled_game, identity_of_bot)
-
-        # creating a list of actions done by leaf node
-        selected_node = node
-        select_actions = []
-        while selected_node.parent:
-            select_actions.append(selected_node.parent_action)
-            selected_node = selected_node.parent
-        select_actions.reverse()
-
-        # apply the next state for each action in our list
-        for action in select_actions:
-            sampled_game = board.next_state(sampled_game, action)
-
-        # if there are no more untried actions, determine winner by point value
-        if not node.untried_actions:
-            won = board.points_values(sampled_game)[1]
-        else:   # else add leaf node, sample next state with the parent of new node and rollout
-            node = expand_leaf(node, board, sampled_game)
-            sampled_game = board.next_state(sampled_game, node.parent_action)
-            sampled_game = rollout(board, sampled_game)
-            won = board.points_values(sampled_game)[1]  # determine winner
-        backpropagate(node, won)    # update wins and visits of node
-
-    # determine best action, works the same as traverse_nodes
-    best_winrate = -inf
     if identity_of_bot == 1:
-        sign = 1
-    else:
-        sign = -1
-    for action, child in root_node.child_nodes.items():
-        child_winrate = (child.wins / child.visits) * sign
-        if child_winrate > best_winrate:
-            best_action = action
-            best_winrate = child_winrate
+        for steps in range(num_nodes):
+            # Copy the game for sampling a playthrough
+            sampled_game = state
 
-    return best_action
+            # Start at root
+            node = root_node
+
+            # Do MCTS - This is all you!
+
+            # traverse tree until we find best leaf and select it
+            node = traverse_nodes(node, board, sampled_game, identity_of_bot)
+
+            # creating a list of actions done by leaf node
+            selected_node = node
+            select_actions = []
+            while selected_node.parent:
+                select_actions.append(selected_node.parent_action)
+                selected_node = selected_node.parent
+            select_actions.reverse()
+
+            # apply the next state for each action in our list
+            for action in select_actions:
+                sampled_game = board.next_state(sampled_game, action)
+
+            # if there are no more untried actions, determine winner by point value
+            if not node.untried_actions:
+                won = board.points_values(sampled_game)[1]
+            else:   # else add leaf node, sample next state with the parent of new node and rollout
+                node = expand_leaf(node, board, sampled_game)
+                sampled_game = board.next_state(sampled_game, node.parent_action)
+                sampled_game = rollout(board, sampled_game)
+                won = board.points_values(sampled_game)[1]  # determine winner
+            backpropagate(node, won)    # update wins and visits of node
+
+        # determine best action, works the same as traverse_nodes
+        best_winrate = -inf
+        if identity_of_bot == 1:
+            sign = 1
+        else:
+            sign = -1
+        for action, child in root_node.child_nodes.items():
+            child_winrate = (child.wins / child.visits) * sign
+            if child_winrate > best_winrate:
+                best_action = action
+                best_winrate = child_winrate
+
+        return best_action
+
+    else:
+        for steps in range(num_nodesTWO):
+            # Copy the game for sampling a playthrough
+            sampled_game = state
+
+            # Start at root
+            node = root_node
+
+            # Do MCTS - This is all you!
+
+            # traverse tree until we find best leaf and select it
+            node = traverse_nodes(node, board, sampled_game, identity_of_bot)
+
+            # creating a list of actions done by leaf node
+            selected_node = node
+            select_actions = []
+            while selected_node.parent:
+                select_actions.append(selected_node.parent_action)
+                selected_node = selected_node.parent
+            select_actions.reverse()
+
+            # apply the next state for each action in our list
+            for action in select_actions:
+                sampled_game = board.next_state(sampled_game, action)
+
+            # if there are no more untried actions, determine winner by point value
+            if not node.untried_actions:
+                won = board.points_values(sampled_game)[1]
+            else:   # else add leaf node, sample next state with the parent of new node and rollout
+                node = expand_leaf(node, board, sampled_game)
+                sampled_game = board.next_state(sampled_game, node.parent_action)
+                sampled_game = rollout(board, sampled_game)
+                won = board.points_values(sampled_game)[1]  # determine winner
+            backpropagate(node, won)    # update wins and visits of node
+
+        # determine best action, works the same as traverse_nodes
+        best_winrate = -inf
+        if identity_of_bot == 1:
+            sign = 1
+        else:
+            sign = -1
+        for action, child in root_node.child_nodes.items():
+            child_winrate = (child.wins / child.visits) * sign
+            if child_winrate > best_winrate:
+                best_action = action
+                best_winrate = child_winrate
+
+        return best_action
