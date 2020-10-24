@@ -5,7 +5,7 @@ from math import sqrt, log, inf
 import p3_t3
 
 num_nodes = 100
-num_nodesTWO = 25
+num_nodesTWO = 100
 explore_faction = 2.
 
 def traverse_nodes(node, board, state, identity):
