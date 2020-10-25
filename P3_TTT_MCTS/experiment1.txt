@@ -5,7 +5,7 @@ The biggest discrepency is when both players are the same size, that being 100. 
 to Player 2 and my only explanation is that being the first move offers a huge advantage in how things play out. At around 125 range, Player 2 is 
 slightly behind, and Player 2 will begin to consistenly perform even or slightly better at further levels. Though we also begin to see a sharp decrease in 
 exponential winrate for Player 2. From size 25 to 50 there was a 110% growth, there was an 80% growth for 50 to 100 and most disappointingly,
-an increase from size 100 to size 200 only gave a 19 percent growth in win rate. We believe that there's only so many options that two calculating
+an increase from size 100 to size 200 only gave a 19% growth in win rate. We believe that there's only so many options that two calculating
 AI can make against each other that at higher levels, the skill gap caused by size starts to plateau.
 
 Side Note:
