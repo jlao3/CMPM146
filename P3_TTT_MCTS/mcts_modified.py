@@ -1,10 +1,13 @@
 from mcts_node import MCTSNode
 from random import choice
 from math import sqrt, log, inf
+import operator
+import itertools
 import p3_t3
 
-num_nodes = 100
-num_nodesTWO = 100
+
+num_nodes = 1000
+num_nodesTWO = 1000
 explore_faction = 2.
 
 
@@ -75,32 +78,43 @@ def rollout(board, state):
         state:  The state of the game.
 
     """
+    # Winning States
+    winCon = False
+    movesDone = board.owned_boxes(state)
+    p = board.current_player(state)
 
-    print(board.legal_actions(state))
-    print(board.owned_boxes(state))
     while not board.is_ended(state):    # while game is not done
 
-        # possible_actions = board.legal_actions(state)
-        # possible_corners = []
-        # possible_betweens = []
-        # for move in possible_actions:
-        #     if move[2] != 1 and move[3] != 1 and len(possible_corners) < 3:
-        #         possible_corners.append(move)
-
-        #     if move[2] == 1 or move[3] == 1 and move[2] != move[3] and len(possible_corners) < 3:
-        #         possible_betweens.append(move)
-
-        # tempBool = True
-        # if possible_corners and tempBool == True:
-        #     action = choice(possible_corners)
-        #     state = board.next_state(state, action)
-        #     tempBool == False
-        # else:
-        #     action = choice(possible_actions)
-        #     state = board.next_state(state, action)
-        #     tempBool == True
-
         # Evaluate Score 1000f1 + 100f2 - 10f3 - 1f2
+        possible_actions = board.legal_actions(state)
+        action = choice(possible_actions)
+        movesDone[tuple([action[2], action[3]])] = board.current_player(state)
+
+        if ((movesDone[(0, 0)] == p and movesDone[(0, 1)] == p and movesDone[(0, 2)] == p) or
+                (movesDone[(1, 0)] == p and movesDone[(1, 1)] == p and movesDone[(1, 2)] == p) or
+                (movesDone[(2, 0)] == p and movesDone[(2, 1)] == p and movesDone[(2, 2)] == p) or
+                (movesDone[(0, 0)] == p and movesDone[(1, 0)] == p and movesDone[(2, 0)] == p) or
+                (movesDone[(0, 1)] == p and movesDone[(1, 1)] == p and movesDone[(2, 1)] == p) or
+                (movesDone[(0, 2)] == p and movesDone[(1, 2)] == p and movesDone[(2, 2)] == p) or
+                (movesDone[(0, 0)] == p and movesDone[(1, 1)] == p and movesDone[(2, 2)] == p) or
+                (movesDone[(2, 0)] == p and movesDone[(1, 1)] == p and movesDone[(0, 2)] == p)):
+            winCon = True
+
+        if (((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0)) or
+            ((movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(1, 2)] == p and movesDone[(1, 2)] != 0)) or
+            ((movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
+            ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0)) or
+            ((movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 1)] == p and movesDone[(2, 1)] != 0)) or
+            ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
+            ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0))):
+            winCon = True
+
+        if winCon == True:
+            state = board.next_state(state, action)
+        else:
+            action = choice(possible_actions)
+            state = board.next_state(state, action)
 
     return state
 
@@ -235,52 +249,49 @@ def think(board, state):
         return best_action
 
 
-def evaluate_score(board, state):
+# def evaluate_score(board, state):
 
-    identity_of_bot = board.current_player(state)
+#     identity_of_bot = board.current_player(state)
 
-    localBoardState = board.owned_boxes(state)
+#     localBoardState = board.owned_boxes(state)
 
-    possible_actions = board.legal_actions(state)
+#     possible_actions = board.legal_actions(state)
 
-    scoreDict = {(0, 0): 3, (0, 1): 2, (0, 2): 3, (1, 0): 2, (1, 1)                 : 4, (1, 2): 2, (2, 0): 3, (2, 1): 2, (2, 2): 3}
-    # Take middle value if board is empty
-    emptyBoard = True
+#     scoreDict = {(0, 0): 3, (0, 1): 2, (0, 2): 3, (1, 0): 2, (1, 1)
+#                   : 4, (1, 2): 2, (2, 0): 3, (2, 1): 2, (2, 2): 3}
+#     # Take middle value if board is empty
 
-    for key in localBoardState:
-        if localBoardState[key] != 0:
-            emptyBoard = False
+#     neighbors = {}
+#     neighborList = []
 
-    if emptyBoard == True:
-        tempList = [x for x in possible_actions if x[2] == 1 and x[3] == 1]
-        return tempList[0]
+#     for move in possible_actions:
+#         for i in range(move[2]-1, move[2]+2):
+#             for j in range(move[3]-1, move[3]+2):
+#                 if (i != move[2] and j != move[3]):
+#                     validMove = tuple([i, j])
+#                     if (validMove in localBoardState) and localBoardState[validMove] == 0:
+#                         neighborList.append(
+#                             tuple([validMove[0], validMove[1]]))
+#                 elif (i != move[2] or j != move[3]):
+#                     validMove = tuple([i, j])
+#                     if (validMove in localBoardState) and localBoardState[validMove] == 0:
+#                         neighborList.append(
+#                             tuple([validMove[0], validMove[1]]))
 
-    neighbors = {}
-    neighborList = []
+#         neighbors[move] = neighborList
+#         neighborList = []
 
-    for move in possible_actions:
-        for i in range(move[2]-1, move[2]+2):
-            for j in range(move[3]-1, move[3]+2):
-                if (i != move[2] and j != move[3]):
-                    validMove = tuple([i, j])
-                    if (validMove in localBoardState) and localBoardState[validMove] == 0:
-                        neighborList.append(
-                            tuple([validMove[0], validMove[1]]))
-                elif (i != move[2] or j != move[3]):
-                    validMove = tuple([i, j])
-                    if (validMove in localBoardState) and localBoardState[validMove] == 0:
-                        neighborList.append(
-                            tuple([validMove[0], validMove[1]]))
+#     for move in possible_actions:
 
-        neighbors[move] = neighborList
-        neighborList = []
+#         for i in range(len(neighbors[move])):
+#             if localBoardState[neighbors[move][i]] == identity_of_bot:
+#                 scoreDict[tuple([move[2], move[3]])] += 10
+#             elif localBoardState[neighbors[move][i]] != identity_of_bot and not 0:
+#                 scoreDict[tuple([move[2], move[3]])] -= 10
+#             else:
+#                 scoreDict[tuple([move[2], move[3]])] += 0
 
-    for move in possible_actions:
-
-        for i in range(len(neighbors[move])):
-            if localBoardState[neighbors[move][i]] == identity_of_bot:
-                scoreDict[move] += 10
-            elif localBoardState[neighbors[move][i]] != identity_of_bot and not 0:
-                scoreDict[move] -= 10
-            else:
-                scoreDict[move] += 0
+#     maxKey = max(scoreDict, key=scoreDict.get)
+#     tempMove2 = possible_actions[0]
+#     maxMove = tuple([tempMove2[0], tempMove2[1], maxKey[0], maxKey[1]])
+#     return maxMove
