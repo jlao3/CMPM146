@@ -1,4 +1,3 @@
-
 from mcts_node import MCTSNode
 from random import choice
 from math import sqrt, log, inf
@@ -7,6 +6,7 @@ import p3_t3
 num_nodes = 100
 num_nodesTWO = 100
 explore_faction = 2.
+
 
 def traverse_nodes(node, board, state, identity):
     """ Traverses the tree until the end criterion are met.
@@ -27,17 +27,21 @@ def traverse_nodes(node, board, state, identity):
     else:
         nextNode = None
         highScore = -inf
-        for catcher, childNode in currentNode.child_nodes.items(): #catcher contains values we don't care about in node, childNode is what we want to check
+        # catcher contains values we don't care about in node, childNode is what we want to check
+        for catcher, childNode in currentNode.child_nodes.items():
             childNode.visits += 1
             if identity == 1:   # if red then value is equal to 1, thus nothing happens
-                tempScore = (childNode.wins / childNode.visits) + (explore_faction * sqrt(log(childNode.parent.visits) / childNode.visits))
+                tempScore = (childNode.wins / childNode.visits) + (explore_faction *
+                                                                   sqrt(log(childNode.parent.visits) / childNode.visits))
             else:   # else identity is blue, thus multiple by -1
-                tempScore = ((-1 * childNode.wins) / childNode.visits) + (explore_faction * sqrt(log(childNode.parent.visits) / childNode.visits))
+                tempScore = ((-1 * childNode.wins) / childNode.visits) + (
+                    explore_faction * sqrt(log(childNode.parent.visits) / childNode.visits))
             if tempScore > highScore:   # if temporary score is higher then our best, then make that the next searched node and update highScore
                 highScore = tempScore
                 nextNode = childNode
         return traverse_nodes(nextNode, board, state, identity)
     # Hint: return leaf_node
+
 
 def expand_leaf(node, board, state):
     """ Adds a new leaf to the tree by creating a new child node for the given node.
@@ -51,13 +55,15 @@ def expand_leaf(node, board, state):
 
     """
     try:
-        action = node.untried_actions.pop() # tries to pop() an action from the list
+        action = node.untried_actions.pop()  # tries to pop() an action from the list
     except:
-        return node # if list is empty, return node
+        return node  # if list is empty, return node
     else:
         state = board.next_state(state, action)
-        new_node = MCTSNode(parent=node, parent_action=action,action_list=board.legal_actions(state)) # create new leaf with list of legal actions
-        node.child_nodes[action] = new_node # make pointer of child node equal the new_node
+        new_node = MCTSNode(parent=node, parent_action=action, action_list=board.legal_actions(
+            state))  # create new leaf with list of legal actions
+        # make pointer of child node equal the new_node
+        node.child_nodes[action] = new_node
         return new_node
 
 
@@ -70,10 +76,13 @@ def rollout(board, state):
 
     """
     while not board.is_ended(state):    # while game is not done
-        possible_actions = board.legal_actions(state)   # acquire a list of legal actions
+        possible_actions = board.legal_actions(
+            state)   # acquire a list of legal actions
         action = choice(possible_actions)   # choose a random action
-        state = board.next_state(state, action) # state becomes the next state of chosen action
+        # state becomes the next state of chosen action
+        state = board.next_state(state, action)
     return state
+
 
 def backpropagate(node, won):
     """ Navigates the tree from a leaf node to the root, updating the win and visit count of each node along the path.
@@ -101,7 +110,8 @@ def think(board, state):
 
     """
     identity_of_bot = board.current_player(state)
-    root_node = MCTSNode(parent=None, parent_action=None, action_list=board.legal_actions(state))
+    root_node = MCTSNode(parent=None, parent_action=None,
+                         action_list=board.legal_actions(state))
 
     if identity_of_bot == 1:
         for steps in range(num_nodes):
@@ -133,7 +143,8 @@ def think(board, state):
                 won = board.points_values(sampled_game)[1]
             else:   # else add leaf node, sample next state with the parent of new node and rollout
                 node = expand_leaf(node, board, sampled_game)
-                sampled_game = board.next_state(sampled_game, node.parent_action)
+                sampled_game = board.next_state(
+                    sampled_game, node.parent_action)
                 sampled_game = rollout(board, sampled_game)
                 won = board.points_values(sampled_game)[1]  # determine winner
             backpropagate(node, won)    # update wins and visits of node
@@ -182,7 +193,8 @@ def think(board, state):
                 won = board.points_values(sampled_game)[1]
             else:   # else add leaf node, sample next state with the parent of new node and rollout
                 node = expand_leaf(node, board, sampled_game)
-                sampled_game = board.next_state(sampled_game, node.parent_action)
+                sampled_game = board.next_state(
+                    sampled_game, node.parent_action)
                 sampled_game = rollout(board, sampled_game)
                 won = board.points_values(sampled_game)[1]  # determine winner
             backpropagate(node, won)    # update wins and visits of node
