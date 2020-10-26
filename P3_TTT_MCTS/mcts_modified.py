@@ -166,12 +166,7 @@ def think(board, state):
             node = traverse_nodes(node, board, sampled_game, identity_of_bot)
 
             # creating a list of actions done by leaf node
-            selected_node = node
-            select_actions = []
-            while selected_node.parent:
-                select_actions.append(selected_node.parent_action)
-                selected_node = selected_node.parent
-            select_actions.reverse()
+            select_actions = aList(node)
 
             # apply the next state for each action in our list
             for action in select_actions:
@@ -189,17 +184,7 @@ def think(board, state):
             backpropagate(node, won)    # update wins and visits of node
 
         # determine best action, works the same as traverse_nodes
-        best_winrate = -inf
-        if identity_of_bot == 1:
-            sign = 1
-        else:
-            sign = -1
-        for action, child in root_node.child_nodes.items():
-            child_winrate = (child.wins / child.visits) * sign
-            if child_winrate > best_winrate:
-                best_action = action
-                best_winrate = child_winrate
-
+        best_action = bestAction(root_node, identity_of_bot)
         return best_action
 
     else:
@@ -216,12 +201,7 @@ def think(board, state):
             node = traverse_nodes(node, board, sampled_game, identity_of_bot)
 
             # creating a list of actions done by leaf node
-            selected_node = node
-            select_actions = []
-            while selected_node.parent:
-                select_actions.append(selected_node.parent_action)
-                selected_node = selected_node.parent
-            select_actions.reverse()
+            select_actions = aList(node)
 
             # apply the next state for each action in our list
             for action in select_actions:
@@ -239,19 +219,32 @@ def think(board, state):
             backpropagate(node, won)    # update wins and visits of node
 
         # determine best action, works the same as traverse_nodes
-        best_winrate = -inf
-        if identity_of_bot == 1:
-            sign = 1
-        else:
-            sign = -1
-        for action, child in root_node.child_nodes.items():
-            child_winrate = (child.wins / child.visits) * sign
-            if child_winrate > best_winrate:
-                best_action = action
-                best_winrate = child_winrate
-
+        best_action = bestAction(root_node, identity_of_bot)
         return best_action
 
+def aList(node):
+    # creating a list of actions done by leaf node
+    selected_node = node
+    select_actions = []
+    while selected_node.parent:
+        select_actions.append(selected_node.parent_action)
+        selected_node = selected_node.parent
+    select_actions.reverse()
+    return select_actions
+
+def bestAction(root_node, identity_of_bot):
+    best_winrate = -inf
+    if identity_of_bot == 1:
+        sign = 1
+    else:
+        sign = -1
+    for action, child in root_node.child_nodes.items():
+        child_winrate = (child.wins / child.visits) * sign
+        if child_winrate > best_winrate:
+            best_action = action
+            best_winrate = child_winrate
+
+    return best_action
 
 # def evaluate_score(board, state):
 
