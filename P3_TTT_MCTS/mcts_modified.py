@@ -6,8 +6,8 @@ import itertools
 import p3_t3
 
 
-num_nodes = 1000
-num_nodesTWO = 1000
+num_nodes = 500
+num_nodesTWO = 500
 explore_faction = 2.
 
 
@@ -79,42 +79,50 @@ def rollout(board, state):
 
     """
     # Winning States
-    winCon = False
-    movesDone = board.owned_boxes(state)
+
     p = board.current_player(state)
 
     while not board.is_ended(state):    # while game is not done
-
+        winCon = False
         # Evaluate Score 1000f1 + 100f2 - 10f3 - 1f2
         possible_actions = board.legal_actions(state)
+        movesDone = board.owned_boxes(state)
+        print(movesDone)
         action = choice(possible_actions)
-        movesDone[tuple([action[2], action[3]])] = board.current_player(state)
-
+        movesDone[tuple([action[2], action[3]])
+                  ] = board.current_player(state)
         if ((movesDone[(0, 0)] == p and movesDone[(0, 1)] == p and movesDone[(0, 2)] == p) or
-                (movesDone[(1, 0)] == p and movesDone[(1, 1)] == p and movesDone[(1, 2)] == p) or
-                (movesDone[(2, 0)] == p and movesDone[(2, 1)] == p and movesDone[(2, 2)] == p) or
-                (movesDone[(0, 0)] == p and movesDone[(1, 0)] == p and movesDone[(2, 0)] == p) or
-                (movesDone[(0, 1)] == p and movesDone[(1, 1)] == p and movesDone[(2, 1)] == p) or
-                (movesDone[(0, 2)] == p and movesDone[(1, 2)] == p and movesDone[(2, 2)] == p) or
-                (movesDone[(0, 0)] == p and movesDone[(1, 1)] == p and movesDone[(2, 2)] == p) or
+            (movesDone[(1, 0)] == p and movesDone[(1, 1)] == p and movesDone[(1, 2)] == p) or
+            (movesDone[(2, 0)] == p and movesDone[(2, 1)] == p and movesDone[(2, 2)] == p) or
+            (movesDone[(0, 0)] == p and movesDone[(1, 0)] == p and movesDone[(2, 0)] == p) or
+            (movesDone[(0, 1)] == p and movesDone[(1, 1)] == p and movesDone[(2, 1)] == p) or
+            (movesDone[(0, 2)] == p and movesDone[(1, 2)] == p and movesDone[(2, 2)] == p) or
+            (movesDone[(0, 0)] == p and movesDone[(1, 1)] == p and movesDone[(2, 2)] == p) or
                 (movesDone[(2, 0)] == p and movesDone[(1, 1)] == p and movesDone[(0, 2)] == p)):
             winCon = True
 
-        if (((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0)) or
-            ((movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(1, 2)] == p and movesDone[(1, 2)] != 0)) or
-            ((movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
-            ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0)) or
-            ((movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 1)] == p and movesDone[(2, 1)] != 0)) or
-            ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
-            ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
-                ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0))):
+        if ((movesDone[(0, 0)] != 0 and movesDone[(0, 1)] != 0 and movesDone[(0, 2)] != 0) or
+            (movesDone[(1, 0)] != 0 and movesDone[(1, 1)] != 0 and movesDone[(1, 2)] != 0) or
+            (movesDone[(2, 0)] != 0 and movesDone[(2, 1)] != 0 and movesDone[(2, 2)] != 0) or
+            (movesDone[(0, 0)] != 0 and movesDone[(1, 0)] != 0 and movesDone[(2, 0)] != 0) or
+            (movesDone[(0, 1)] != 0 and movesDone[(1, 1)] != 0 and movesDone[(2, 1)] != 0) or
+            (movesDone[(0, 2)] != 0 and movesDone[(1, 2)] != 0 and movesDone[(2, 2)] != 0) or
+            (movesDone[(0, 0)] != 0 and movesDone[(1, 1)] != 0 and movesDone[(2, 2)] != 0) or
+                (movesDone[(2, 0)] != 0 and movesDone[(1, 1)] != 0 and movesDone[(0, 2)] != 0)):
             winCon = True
+        # if (((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0)) or
+        #     ((movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(1, 2)] == p and movesDone[(1, 2)] != 0)) or
+        #     ((movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
+        #     ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0)) or
+        #     ((movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 1)] == p and movesDone[(2, 1)] != 0)) or
+        #     ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
+        #     ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
+        #         ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0))):
+        #     winCon = True
 
-        if winCon == True:
+        if winCon == True or winconTwo == True:
             state = board.next_state(state, action)
         else:
-            action = choice(possible_actions)
-            state = board.next_state(state, action)
 
     return state
 
