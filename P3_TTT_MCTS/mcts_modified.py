@@ -1,10 +1,12 @@
-
 from mcts_node import MCTSNode
 from random import choice
-from math import sqrt, log
+from math import sqrt, log, inf
+import p3_t3
 
-num_nodes = 1000
+num_nodes = 100
+num_nodesTWO = 100
 explore_faction = 2.
+
 
 def traverse_nodes(node, board, state, identity):
     """ Traverses the tree until the end criterion are met.
@@ -18,7 +20,26 @@ def traverse_nodes(node, board, state, identity):
     Returns:        A node from which the next stage of the search can proceed.
 
     """
-    pass
+    currentNode = node
+
+    if currentNode.untried_actions or not currentNode.child_nodes:
+        return currentNode
+    else:
+        nextNode = None
+        highScore = -inf
+        # catcher contains values we don't care about in node, childNode is what we want to check
+        for catcher, childNode in currentNode.child_nodes.items():
+            childNode.visits += 1
+            if identity == 1:   # if red then value is equal to 1, thus nothing happens
+                tempScore = (childNode.wins / childNode.visits) + (explore_faction *
+                                                                   sqrt(log(childNode.parent.visits) / childNode.visits))
+            else:   # else identity is blue, thus multiple by -1
+                tempScore = ((-1 * childNode.wins) / childNode.visits) + (
+                    explore_faction * sqrt(log(childNode.parent.visits) / childNode.visits))
+            if tempScore > highScore:   # if temporary score is higher then our best, then make that the next searched node and update highScore
+                highScore = tempScore
+                nextNode = childNode
+        return traverse_nodes(nextNode, board, state, identity)
     # Hint: return leaf_node
 
 
@@ -33,8 +54,17 @@ def expand_leaf(node, board, state):
     Returns:    The added child node.
 
     """
-    pass
-    # Hint: return new_node
+    try:
+        action = node.untried_actions.pop()  # tries to pop() an action from the list
+    except:
+        return node  # if list is empty, return node
+    else:
+        state = board.next_state(state, action)
+        new_node = MCTSNode(parent=node, parent_action=action, action_list=board.legal_actions(
+            state))  # create new leaf with list of legal actions
+        # make pointer of child node equal the new_node
+        node.child_nodes[action] = new_node
+        return new_node
 
 
 def rollout(board, state):
@@ -45,7 +75,34 @@ def rollout(board, state):
         state:  The state of the game.
 
     """
-    pass
+
+    print(board.legal_actions(state))
+    print(board.owned_boxes(state))
+    while not board.is_ended(state):    # while game is not done
+
+        # possible_actions = board.legal_actions(state)
+        # possible_corners = []
+        # possible_betweens = []
+        # for move in possible_actions:
+        #     if move[2] != 1 and move[3] != 1 and len(possible_corners) < 3:
+        #         possible_corners.append(move)
+
+        #     if move[2] == 1 or move[3] == 1 and move[2] != move[3] and len(possible_corners) < 3:
+        #         possible_betweens.append(move)
+
+        # tempBool = True
+        # if possible_corners and tempBool == True:
+        #     action = choice(possible_corners)
+        #     state = board.next_state(state, action)
+        #     tempBool == False
+        # else:
+        #     action = choice(possible_actions)
+        #     state = board.next_state(state, action)
+        #     tempBool == True
+
+        # Evaluate Score 1000f1 + 100f2 - 10f3 - 1f2
+
+    return state
 
 
 def backpropagate(node, won):
@@ -56,7 +113,11 @@ def backpropagate(node, won):
         won:    An indicator of whether the bot won or lost the game.
 
     """
-    pass
+    if node != None:    # while backtracking is true
+        node.wins += won    # -1 if lost, 0 for draw/nothing, 1 for win
+        node.visits += 1    # count for visits
+        node = node.parent  # traverse to parent node
+        backpropagate(node, won)
 
 
 def think(board, state):
@@ -70,17 +131,156 @@ def think(board, state):
 
     """
     identity_of_bot = board.current_player(state)
-    root_node = MCTSNode(parent=None, parent_action=None, action_list=board.legal_actions(state))
+    root_node = MCTSNode(parent=None, parent_action=None,
+                         action_list=board.legal_actions(state))
 
-    for step in range(num_nodes):
-        # Copy the game for sampling a playthrough
-        sampled_game = state
+    if identity_of_bot == 1:
+        for steps in range(num_nodes):
+            # Copy the game for sampling a playthrough
+            sampled_game = state
 
-        # Start at root
-        node = root_node
+            # Start at root
+            node = root_node
 
-        # Do MCTS - This is all you!
+            # Do MCTS - This is all you!
 
-    # Return an action, typically the most frequently used action (from the root) or the action with the best
-    # estimated win rate.
-    return None
+            # traverse tree until we find best leaf and select it
+            node = traverse_nodes(node, board, sampled_game, identity_of_bot)
+
+            # creating a list of actions done by leaf node
+            selected_node = node
+            select_actions = []
+            while selected_node.parent:
+                select_actions.append(selected_node.parent_action)
+                selected_node = selected_node.parent
+            select_actions.reverse()
+
+            # apply the next state for each action in our list
+            for action in select_actions:
+                sampled_game = board.next_state(sampled_game, action)
+
+            # if there are no more untried actions, determine winner by point value
+            if not node.untried_actions:
+                won = board.points_values(sampled_game)[1]
+            else:   # else add leaf node, sample next state with the parent of new node and rollout
+                node = expand_leaf(node, board, sampled_game)
+                sampled_game = board.next_state(
+                    sampled_game, node.parent_action)
+                sampled_game = rollout(board, sampled_game)
+                won = board.points_values(sampled_game)[1]  # determine winner
+            backpropagate(node, won)    # update wins and visits of node
+
+        # determine best action, works the same as traverse_nodes
+        best_winrate = -inf
+        if identity_of_bot == 1:
+            sign = 1
+        else:
+            sign = -1
+        for action, child in root_node.child_nodes.items():
+            child_winrate = (child.wins / child.visits) * sign
+            if child_winrate > best_winrate:
+                best_action = action
+                best_winrate = child_winrate
+
+        return best_action
+
+    else:
+        for steps in range(num_nodesTWO):
+            # Copy the game for sampling a playthrough
+            sampled_game = state
+
+            # Start at root
+            node = root_node
+
+            # Do MCTS - This is all you!
+
+            # traverse tree until we find best leaf and select it
+            node = traverse_nodes(node, board, sampled_game, identity_of_bot)
+
+            # creating a list of actions done by leaf node
+            selected_node = node
+            select_actions = []
+            while selected_node.parent:
+                select_actions.append(selected_node.parent_action)
+                selected_node = selected_node.parent
+            select_actions.reverse()
+
+            # apply the next state for each action in our list
+            for action in select_actions:
+                sampled_game = board.next_state(sampled_game, action)
+
+            # if there are no more untried actions, determine winner by point value
+            if not node.untried_actions:
+                won = board.points_values(sampled_game)[1]
+            else:   # else add leaf node, sample next state with the parent of new node and rollout
+                node = expand_leaf(node, board, sampled_game)
+                sampled_game = board.next_state(
+                    sampled_game, node.parent_action)
+                sampled_game = rollout(board, sampled_game)
+                won = board.points_values(sampled_game)[1]  # determine winner
+            backpropagate(node, won)    # update wins and visits of node
+
+        # determine best action, works the same as traverse_nodes
+        best_winrate = -inf
+        if identity_of_bot == 1:
+            sign = 1
+        else:
+            sign = -1
+        for action, child in root_node.child_nodes.items():
+            child_winrate = (child.wins / child.visits) * sign
+            if child_winrate > best_winrate:
+                best_action = action
+                best_winrate = child_winrate
+
+        return best_action
+
+
+def evaluate_score(board, state):
+
+    identity_of_bot = board.current_player(state)
+
+    localBoardState = board.owned_boxes(state)
+
+    possible_actions = board.legal_actions(state)
+
+    scoreDict = {(0, 0): 3, (0, 1): 2, (0, 2): 3, (1, 0): 2, (1, 1)                 : 4, (1, 2): 2, (2, 0): 3, (2, 1): 2, (2, 2): 3}
+    # Take middle value if board is empty
+    emptyBoard = True
+
+    for key in localBoardState:
+        if localBoardState[key] != 0:
+            emptyBoard = False
+
+    if emptyBoard == True:
+        tempList = [x for x in possible_actions if x[2] == 1 and x[3] == 1]
+        return tempList[0]
+
+    neighbors = {}
+    neighborList = []
+
+    for move in possible_actions:
+        for i in range(move[2]-1, move[2]+2):
+            for j in range(move[3]-1, move[3]+2):
+                if (i != move[2] and j != move[3]):
+                    validMove = tuple([i, j])
+                    if (validMove in localBoardState) and localBoardState[validMove] == 0:
+                        neighborList.append(
+                            tuple([validMove[0], validMove[1]]))
+                elif (i != move[2] or j != move[3]):
+                    validMove = tuple([i, j])
+                    if (validMove in localBoardState) and localBoardState[validMove] == 0:
+                        neighborList.append(
+                            tuple([validMove[0], validMove[1]]))
+
+        neighbors[move] = neighborList
+        neighborList = []
+
+    for move in possible_actions:
+
+        for i in range(len(neighbors[move])):
+            if localBoardState[neighbors[move][i]] == identity_of_bot:
+                scoreDict[move] += 10
+            elif localBoardState[neighbors[move][i]] != identity_of_bot and not 0:
+                scoreDict[move] -= 10
+            else:
+                scoreDict[move] += 0
