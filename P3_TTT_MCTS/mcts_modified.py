@@ -1,3 +1,7 @@
+# Made by
+#   Justin Lao, jlao3
+#   Claudio Sangeroki, csangero
+
 from mcts_node import MCTSNode
 from random import choice
 from math import sqrt, log, inf
@@ -6,8 +10,8 @@ import itertools
 import p3_t3
 
 
-num_nodes = 1000
-num_nodesTWO = 1000
+num_nodes = 100
+num_nodesTWO = 100
 explore_faction = 2.
 
 
