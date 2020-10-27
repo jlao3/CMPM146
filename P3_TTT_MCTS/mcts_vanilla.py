@@ -7,8 +7,8 @@ from random import choice
 from math import sqrt, log, inf
 import p3_t3
 
-num_nodes = 100
-num_nodesTWO = 100
+num_nodes = 1000
+num_nodesTWO = 1000
 explore_faction = 2.
 
 
@@ -129,7 +129,7 @@ def think(board, state):
 
             # traverse tree until we find best leaf and select it
             node = traverse_nodes(node, board, sampled_game, identity_of_bot)
-            
+
             # creating a list of actions done by leaf node
             select_actions = aList(node)
 
@@ -186,6 +186,7 @@ def think(board, state):
         best_action = bestAction(root_node, identity_of_bot)
         return best_action
 
+
 def aList(node):
     # creating a list of actions done by leaf node
     selected_node = node
@@ -195,6 +196,7 @@ def aList(node):
         selected_node = selected_node.parent
     select_actions.reverse()
     return select_actions
+
 
 def bestAction(root_node, identity_of_bot):
     best_winrate = -inf

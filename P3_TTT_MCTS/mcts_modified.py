@@ -5,13 +5,12 @@
 from mcts_node import MCTSNode
 from random import choice
 from math import sqrt, log, inf
-import operator
-import itertools
+import random
 import p3_t3
 
 
-num_nodes = 100
-num_nodesTWO = 100
+num_nodes = 1000
+num_nodesTWO = 1000
 explore_faction = 2.
 
 
@@ -83,41 +82,111 @@ def rollout(board, state):
 
     """
     # Winning States
-    winCon = False
-    movesDone = board.owned_boxes(state)
+
     p = board.current_player(state)
 
     while not board.is_ended(state):    # while game is not done
-
+        winConOne = False
+        winConTwo = False
         # Evaluate Score 1000f1 + 100f2 - 10f3 - 1f2
         possible_actions = board.legal_actions(state)
-        action = choice(possible_actions)
-        movesDone[tuple([action[2], action[3]])] = board.current_player(state)
+        possible_actions2 = board.legal_actions(state)
+        possible_actions3 = board.legal_actions(state)
+        movesDone = board.owned_boxes(state)
 
-        if ((movesDone[(0, 0)] == p and movesDone[(0, 1)] == p and movesDone[(0, 2)] == p) or
+        sampleMoves = random.choices(possible_actions, k=3)
+
+        for i in sampleMoves:
+            movesDone[tuple([i[2], i[3]])
+                      ] = p
+            if ((movesDone[(0, 0)] == p and movesDone[(0, 1)] == p and movesDone[(0, 2)] == p) or
                 (movesDone[(1, 0)] == p and movesDone[(1, 1)] == p and movesDone[(1, 2)] == p) or
                 (movesDone[(2, 0)] == p and movesDone[(2, 1)] == p and movesDone[(2, 2)] == p) or
                 (movesDone[(0, 0)] == p and movesDone[(1, 0)] == p and movesDone[(2, 0)] == p) or
                 (movesDone[(0, 1)] == p and movesDone[(1, 1)] == p and movesDone[(2, 1)] == p) or
                 (movesDone[(0, 2)] == p and movesDone[(1, 2)] == p and movesDone[(2, 2)] == p) or
                 (movesDone[(0, 0)] == p and movesDone[(1, 1)] == p and movesDone[(2, 2)] == p) or
-                (movesDone[(2, 0)] == p and movesDone[(1, 1)] == p and movesDone[(0, 2)] == p)):
-            winCon = True
+                    (movesDone[(2, 0)] == p and movesDone[(1, 1)] == p and movesDone[(0, 2)] == p)):
+                winConOne = True
+                action = i
+            movesDone = board.owned_boxes(state)
 
-        if (((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0)) or
-            ((movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(1, 2)] == p and movesDone[(1, 2)] != 0)) or
-            ((movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
-            ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0)) or
-            ((movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 1)] == p and movesDone[(2, 1)] != 0)) or
-            ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
-            ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 2)] == p and movesDone[(2, 2)] != 0)) or
-                ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 0)] == p and movesDone[(2, 0)] != 0))):
-            winCon = True
-
-        if winCon == True:
+        if winConOne == True:
             state = board.next_state(state, action)
+
+        # while winConTwo == False and possible_actions2:
+        for i in sampleMoves:
+
+            movesDone[tuple([i[2], i[3]])
+                      ] = p
+            if (((movesDone[(0, 0)] == p) and (movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0)) or
+                ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(0, 1)] == p) and (movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0)) or
+                ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(0, 2)] == p)) or
+                ((movesDone[(1, 0)] == p) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0)) or
+                ((movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(1, 1)] == p) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0)) or
+                ((movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(1, 2)] == p)) or
+                ((movesDone[(2, 0)] == p) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0) and (movesDone[(2, 2)] != p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0) and (movesDone[(2, 1)] == p) and (movesDone[(2, 2)] != p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0) and (movesDone[(2, 2)] == p)) or
+                ((movesDone[(0, 0)] == p) and (movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0)) or
+                ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 0)] == p) and (movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0)) or
+                ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 0)] != p and movesDone[(1, 0)] != 0) and (movesDone[(2, 0)] == p)) or
+                ((movesDone[(0, 1)] == p) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0)) or
+                ((movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(1, 1)] == p) and (movesDone[(2, 1)] != p and movesDone[(2, 1)] != 0)) or
+                ((movesDone[(0, 1)] != p and movesDone[(0, 1)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 1)] == p)) or
+                ((movesDone[(0, 2)] == p) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0) and (movesDone[(2, 2)] != p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 2)] == p) and (movesDone[(2, 2)] != p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 2)] != p and movesDone[(1, 2)] != 0) and (movesDone[(2, 2)] == p)) or
+                ((movesDone[(0, 0)] == p) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 2)] != p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 1)] == p) and (movesDone[(2, 2)] != p and movesDone[(2, 2)] != 0)) or
+                ((movesDone[(0, 0)] != p and movesDone[(0, 0)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 2)] == p)) or
+                ((movesDone[(0, 2)] == p) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0)) or
+                ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 1)] == p) and (movesDone[(2, 0)] != p and movesDone[(2, 0)] != 0)) or
+                    ((movesDone[(0, 2)] != p and movesDone[(0, 2)] != 0) and (movesDone[(1, 1)] != p and movesDone[(1, 1)] != 0) and (movesDone[(2, 0)] == p))):
+                winConTwo = True
+                action = i
+            movesDone = board.owned_boxes(state)
+
+        # count = 0
+        # if p == 1:
+        #     while winConTwo == False and possible_actions2 and count < 10:
+        #         action = possible_actions2.pop()
+        #         movesDone[tuple([action[2], action[3]])
+        #                   ] = board.current_player(state)
+        #         if ((movesDone[(0, 0)] == 1 and movesDone[(0, 1)] == 2 and movesDone[(0, 2)] == 2) or
+        #             (movesDone[(0, 0)] == 2 and movesDone[(0, 1)] == 1 and movesDone[(0, 2)] == 2) or
+        #             (movesDone[(0, 0)] == 2 and movesDone[(0, 1)] == 2 and movesDone[(0, 2)] == 1) or
+        #                 (movesDone[(1, 0)] == 1 and movesDone[(1, 1)] == 2 and movesDone[(1, 2)] == 2) or
+        #                 (movesDone[(1, 0)] == 2 and movesDone[(1, 1)] == 1 and movesDone[(1, 2)] == 2) or
+        #                 (movesDone[(1, 0)] == 2 and movesDone[(1, 1)] == 2 and movesDone[(1, 2)] == 1) or
+        #                 (movesDone[(2, 0)] == 1 and movesDone[(2, 1)] == 2 and movesDone[(2, 2)] == 2) or
+        #                 (movesDone[(2, 0)] == 2 and movesDone[(2, 1)] == 1 and movesDone[(2, 2)] == 2) or
+        #                 (movesDone[(2, 0)] == 2 and movesDone[(2, 1)] == 2 and movesDone[(2, 2)] == 1) or
+        #                 (movesDone[(0, 0)] == 1 and movesDone[(1, 0)] == 2 and movesDone[(2, 0)] == 2) or
+        #                 (movesDone[(0, 0)] == 2 and movesDone[(1, 0)] == 1 and movesDone[(2, 0)] == 2) or
+        #                 (movesDone[(0, 0)] == 2 and movesDone[(1, 0)] == 2 and movesDone[(2, 0)] == 1) or
+        #                 (movesDone[(0, 1)] == 1 and movesDone[(1, 1)] == 2 and movesDone[(2, 1)] == 2) or
+        #                 (movesDone[(0, 1)] == 2 and movesDone[(1, 1)] == 1 and movesDone[(2, 1)] == 2) or
+        #                 (movesDone[(0, 1)] == 2 and movesDone[(1, 1)] == 2 and movesDone[(2, 1)] == 1) or
+        #                 (movesDone[(0, 2)] == 1 and movesDone[(1, 2)] == 2 and movesDone[(2, 2)] == 2) or
+        #                 (movesDone[(0, 2)] == 2 and movesDone[(1, 2)] == 1 and movesDone[(2, 2)] == 2) or
+        #                 (movesDone[(0, 2)] == 2 and movesDone[(1, 2)] == 2 and movesDone[(2, 2)] == 1) or
+        #                 (movesDone[(0, 0)] == 1 and movesDone[(1, 1)] == 2 and movesDone[(2, 2)] == 2) or
+        #                 (movesDone[(0, 0)] == 2 and movesDone[(1, 1)] == 1 and movesDone[(2, 2)] == 2) or
+        #                 (movesDone[(0, 0)] == 2 and movesDone[(1, 1)] == 2 and movesDone[(2, 2)] == 1) or
+        #                 (movesDone[(2, 0)] == 1 and movesDone[(1, 1)] == 2 and movesDone[(0, 2)] == 2) or
+        #                 (movesDone[(2, 0)] == 2 and movesDone[(1, 1)] == 1 and movesDone[(0, 2)] == 2) or
+        #                 (movesDone[(2, 0)] == 2 and movesDone[(1, 1)] == 2 and movesDone[(0, 2)] == 1)):
+        #             winConTwo = True
+
+        #         movesDone = board.owned_boxes(state)
+        #         count += 1
+
+        if winConTwo == True and winConOne != True:
+            state = board.next_state(state, action)
+
         else:
-            action = choice(possible_actions)
+            action = choice(possible_actions3)
             state = board.next_state(state, action)
 
     return state
@@ -222,6 +291,7 @@ def think(board, state):
         best_action = bestAction(root_node, identity_of_bot)
         return best_action
 
+
 def aList(node):
     # creating a list of actions done by leaf node
     selected_node = node
@@ -231,6 +301,7 @@ def aList(node):
         selected_node = selected_node.parent
     select_actions.reverse()
     return select_actions
+
 
 def bestAction(root_node, identity_of_bot):
     best_winrate = -inf
