@@ -56,8 +56,14 @@ def attack_weakest_enemy_planet(state):
         # No legal source or destination
         return False
     else:
-        # (4) Send half the ships from my strongest planet to the weakest enemy planet.
-        return issue_order(state, strongest_planet.ID, weakest_planet.ID, strongest_planet.num_ships / 2)
+        # required ships along with safety net
+        required_ships = weakest_planet.num_ships + state.distance(strongest_planet.ID, strongest_planet.ID) * weakest_planet.growth_rate + 20
+        if strongest_planet.num_ships < required_ships:
+            weakest_neutral = min(state.neutral_planets(), key=lambda p: p.num_ships, default=None)
+            if not weakest_neutral:
+                return False
+            issue_order(state, strongest_planet.ID, weakest_neutral.ID, weakest_neutral.num_ships + 1)
+        return issue_order(state, strongest_planet.ID, weakest_planet.ID, required_ships)
 
 
 def spread_to_weakest_neutral_planet(state):
@@ -75,7 +81,6 @@ def spread_to_weakest_neutral_planet(state):
         # No legal source or destination
         return False
     else:
-        # (4) Send half the ships from my strongest planet to the weakest enemy planet.
         for enemy_fleet in state.enemy_fleets(): # for current enemy fleets
             if state.planets[enemy_fleet.destination_planet].ID == weakest_planet.ID: # if an enemy if already attack weakest neutral planet
                 required_ships = enemy_fleet.num_ships - weakest_planet.num_ships # figure out how many ships they'll have left
