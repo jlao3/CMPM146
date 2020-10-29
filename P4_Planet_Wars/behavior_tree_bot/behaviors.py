@@ -11,8 +11,8 @@ def attack_or_defend(state):
             defend_distance = state.distance(strongest_planet.ID, state.planets[enemy_fleet.destination_planet].ID) # Distance from our strongest planet to our sieged planet
 
             best_attack = inf
-            attackShips = state.planets[enemy_fleet.source_planet].num_ships
-            attack_planet = state.planets[enemy_fleet.source_planet]
+            attackShips = None
+            attack_planet = None
 
             for enemy_planet in state.enemy_planets(): # Checking all current enemy planets
                attack_distance = state.distance(strongest_planet.ID, enemy_planet.ID) # Distance from our strongest planet to current target planet
@@ -23,11 +23,18 @@ def attack_or_defend(state):
                        attackShips = required_ships # amount required to take over
                        attack_planet = enemy_planet # Planet to take over
 
-            for my_fleet in state.my_fleets():
-                if enemy_fleet.destination_planet == my_fleet.destination_planet: # If we already have a fleet defending our planet
-                    return issue_order(state, strongest_planet.ID, attack_planet.ID, attackShips) # Then attack
-
-            if defend_distance < best_attack: # If not then judge distance,
+            if defend_distance < best_attack: # If defending is closer,
+                for my_fleet in state.my_fleets(): # Check if we have a fleet already defending
+                    if enemy_fleet.destination_planet == my_fleet.destination_planet: # we already have a fleet defending our planet
+                        if attack_planet != None: # if attack planet doesn't equal None, can happen if their planets are stronger than ours
+                            return issue_order(state, strongest_planet.ID, attack_planet.ID, attackShips) # Then attack
+                        else:
+                            weakest_planet = min(state.enemy_planets(), key=lambda t: t.num_ships, default=None) # find weakest enemy planet
+                            if not weakest_planet: # if no legal source, then just defend
+                                return issue_order(state, strongest_planet.ID, state.planets[enemy_fleet.destination_planet].ID, enemy_fleet.num_ships + 1)
+                            else: # if there is a weakest planet
+                                dedicated_fleet = weakest_planet.num_ships + state.distance(strongest_planet.ID, weakest_planet.ID) * weakest_planet.growth_rate + 1
+                                return issue_order(state, strongest_planet.ID, weakest_planet.ID, dedicated_fleet) # attack with dedicated fleet
                 return issue_order(state, strongest_planet.ID, state.planets[enemy_fleet.destination_planet].ID, enemy_fleet.num_ships + 1) # Defending is closer, thus defend
             else:
                 return issue_order(state, strongest_planet.ID, attack_planet.ID, attackShips) # Attacking is closer, thus attack
@@ -36,7 +43,7 @@ def attack_or_defend(state):
 
 def attack_weakest_enemy_planet(state):
     # (1) If we currently have a fleet in flight, abort plan.
-    if len(state.my_fleets()) >= 1:
+    if len(state.my_fleets()) >= 3:
         return False
 
     # (2) Find my strongest planet.
@@ -55,7 +62,7 @@ def attack_weakest_enemy_planet(state):
 
 def spread_to_weakest_neutral_planet(state):
     # (1) If we currently have a fleet in flight, just do nothing.
-    if len(state.my_fleets()) >= 1:
+    if len(state.my_fleets()) >= 3:
         return False
 
     # (2) Find my strongest planet.
@@ -69,4 +76,11 @@ def spread_to_weakest_neutral_planet(state):
         return False
     else:
         # (4) Send half the ships from my strongest planet to the weakest enemy planet.
-        return issue_order(state, strongest_planet.ID, weakest_planet.ID, strongest_planet.num_ships / 2)
+        for enemy_fleet in state.enemy_fleets(): # for current enemy fleets
+            if state.planets[enemy_fleet.destination_planet].ID == weakest_planet.ID: # if an enemy if already attack weakest neutral planet
+                required_ships = enemy_fleet.num_ships - weakest_planet.num_ships # figure out how many ships they'll have left
+                ships_after_conquer = state.distance(strongest_planet.ID, weakest_planet.ID) * weakest_planet.growth_rate
+                required_ships = required_ships + ships_after_conquer
+                return issue_order(state, strongest_planet.ID, weakest_planet.ID, required_ships) # send enough ships to take over besieged planet
+            else:
+                return issue_order(state, strongest_planet.ID, weakest_planet.ID, weakest_planet.num_ships + 1) # else just attack
