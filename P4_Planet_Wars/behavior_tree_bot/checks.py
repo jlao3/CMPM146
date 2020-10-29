@@ -8,14 +8,6 @@ def have_largest_fleet(state):
            > sum(planet.num_ships for planet in state.enemy_planets()) \
              + sum(fleet.num_ships for fleet in state.enemy_fleets())
 
-def not_attacking(state):
-  if not None in state.enemy_fleets():
-    for enemy_fleet in state.enemy_fleets():
-      if state.planets[enemy_fleet.destination_planet].owner == 1:
-        return False
-  else:
-    return True
-
 def is_attacking(state):
   if not None in state.enemy_fleets():
     for enemy_fleet in state.enemy_fleets():
